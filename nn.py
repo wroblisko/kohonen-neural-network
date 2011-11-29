@@ -18,6 +18,15 @@ def normalize(vec):
 def substract(v1, v2):
     return [v1[it]-v2[it] for it in range(len(v1))]
 
+def distance1D(self, n1, n2):
+    pos1, pos2 = self.neuron_position[n1], self.neuron_position[n2]
+    if pos1==pos2:
+        return 1
+    if abs(pos1-pos2)==1:
+        return 0.1
+    else:
+        return 0
+
 class Neuron:
 
     def __init__(self, weights, func=sigmoid, ro=0.75):
@@ -51,11 +60,15 @@ class KohonenLayer(Layer):
         self.neurons  = []
         self.neuron_position = {}
         self.position_counter = 0
+        self.distance_function = distance1D
 
     def add_neuron(self, neuron):
         self.neurons.append(neuron)
         self.neuron_position[neuron]=self.position_counter
         self.position_counter += 1
+
+    def distance(self, n1, n2):
+        return self.distance_function(self, n1, n2)
             
         
 class NeuralNetwork:
@@ -78,6 +91,7 @@ class NeuralNetwork:
                             L = Layer()	
                         else:
                             L = KohonenLayer()
+
                         L.num_inputs = neuronsNums[-2]
 			
 			for j in range(neuronsNums[-1]):
@@ -138,8 +152,12 @@ class NeuralNetwork:
     def kohonen_learn(self, speed_factor, inputs):
         winner = self.find_winner(inputs)
         inputs = normalize(inputs)
+        layer = self.layers[-1]
         winner_position = self.layers[-1].neuron_position[winner]
-        winner.weights = [winner.weights[i] + speed_factor*(inputs[i]-winner.weights[i]) for i in range(len(inputs))] + [0.0]
+        #obsluga sasiedztwa wielowymiarowego
+        for neuron in layer.neurons:
+            h = layer.distance(neuron, winner)
+            neuron.weights = [neuron.weights[i] + h*speed_factor*(inputs[i]-neuron.weights[i]) for i in range(len(inputs))] + [0.0]
         
         
 
