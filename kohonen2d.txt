@@ -1,0 +1,2 @@
+9 1
+9 kohonen2D linear 0 1
