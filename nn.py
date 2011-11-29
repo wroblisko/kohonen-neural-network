@@ -217,8 +217,8 @@ images = [ [1, 1, 1, 0, 0, 0, 1, 1, 1],
 
 for i in range(8000):
     print "==========================================="
-    for image in images:
-        NN.kohonen_learn(0.1, image)
+    image = images[random.randint(0,3)]
+    NN.kohonen_learn(0.1, image)
     for (idx, image) in enumerate(images):
         NN.calculate(image)
         print "img",idx+1,"-> ",
