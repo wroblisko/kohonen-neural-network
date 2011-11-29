@@ -101,7 +101,7 @@ class NeuralNetwork:
 					weights = [float(x) for x in f.readline().split()]
                                 if layerType=="kohonen":
                                     weights[-1] = 0.0
-                                weights = normalize(weights)
+                                    weights = normalize(weights)
                                 L.add_neuron(Neuron(weights, globals()[activationFun]))
 
 			self.add_layer(L)
@@ -117,12 +117,9 @@ class NeuralNetwork:
             for idx, neuron in enumerate(layer.neurons):
                 print "Neuron %d: weights="%(idx,),neuron.weights
         print "Outputs:", len(self.layers[-1].neurons)
-        
-    def calculate(self, inputs):
-        inputs = normalize(inputs)
-        #if len(inputs) != len(self.layers[0].neurons):
-        #    raise ValueError, 'wrong number of inputs'
-        
+
+    """oblicza bez normalizacji"""
+    def calculate_normal(self, inputs):
         for lid, layer in enumerate(self.layers):
             outputs = []
             for n in layer.neurons:
@@ -131,6 +128,11 @@ class NeuralNetwork:
             layer.output =  outputs
     
         return self.layers[-1].output
+
+    """normalizuje wektor i oblicza"""
+    def calculate(self, inputs):
+        inputs = normalize(inputs)
+        return self.calculate_normal(inputs)
     
     """znajduje neuron ktory daje najwyzsze wyjscie w ostatniej warstwie (narazie jest to warstwa kohonena)
     zwraca neuron ktory wygral i nie jest zmeczony"""
@@ -170,7 +172,7 @@ def print_vector(vec):
 NN = NeuralNetwork(["kohonen.txt"])
 #print NN.test([1,2,3,4,5,6,7,8,9])
 #print NN.calculate([3,6])
-NN.calculate([2,1])
+NN.calculate([1,1])
 NN.show()
 #print "[2,1] normalize=",normalize([2,1])
 images = [ [1, 1, 1, 0, 0, 0, 1, 1, 1],
