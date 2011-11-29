@@ -27,6 +27,13 @@ def distance1D(self, n1, n2):
     else:
         return 0
 
+def empty_distance1D(self, n1, n2):
+    pos1, pos2 = self.neuron_position[n1], self.neuron_position[n2]
+    if pos1==pos2:
+        return 1
+    else:
+        return 0
+
 class Neuron:
 
     def __init__(self, weights, func=sigmoid, ro=0.75):
@@ -69,6 +76,23 @@ class KohonenLayer(Layer):
 
     def distance(self, n1, n2):
         return self.distance_function(self, n1, n2)
+
+
+class KohonenLayer2D(Layer):
+    def __init__(self):
+        self.neurons  = []
+        self.neuron_position = {}
+        self.position_counter = 0
+        self.distance_function = empty_distance1D
+
+    def add_neuron(self, neuron):
+        self.neurons.append(neuron)
+        self.neuron_position[neuron]=self.position_counter
+        self.position_counter += 1
+
+    def distance(self, n1, n2):
+        return self.distance_function(self, n1, n2)
+
             
         
 class NeuralNetwork:
@@ -79,30 +103,42 @@ class NeuralNetwork:
 
 		f = open(argv[0], 'r')
 
-		[networkInputs, layersNum] = [int(x) for x in f.readline().split()]
-		neuronsNums = [networkInputs]
+		[network_inputs, layersNum] = [int(x) for x in f.readline().split()]
+		neurons_number = [network_inputs]
 		for i in range(layersNum):
 			layerDescription = f.readline().split()
-			neuronsNums.append(int(layerDescription[0]))
+			neurons_number.append(int(layerDescription[0]))
                         layerType = layerDescription[1]
 			activationFun = layerDescription[2]
 			
                         if layerType=="normal":
                             L = Layer()	
-                        else:
+                        elif layerType=="kohonen":
                             L = KohonenLayer()
+                        elif layerType=="kohonen2D":
+                            L = KohonenLayer2D()
+                        else:
+                            raise Exception, "Bad layer"
 
-                        L.num_inputs = neuronsNums[-2]
+                        L.num_inputs = neurons_number[-2]
 			
-			for j in range(neuronsNums[-1]):
-				if len(layerDescription) == 5:
-					weights = [ random.uniform(float(layerDescription[3]), float(layerDescription[4])) for i in (range(neuronsNums[-2]+1)) ]
-				else:
-					weights = [float(x) for x in f.readline().split()]
-                                if layerType=="kohonen":
-                                    weights[-1] = 0.0
-                                    weights = normalize(weights)
-                                L.add_neuron(Neuron(weights, globals()[activationFun]))
+                        #dla kazdego neuronu z wczytanej warstwy losuj badz wczytaj wagi
+			for j in range(neurons_number[-1]):                                
+                            if len(layerDescription) == 5:
+                                weights = [ random.uniform(float(layerDescription[3]), float(layerDescription[4])) for i in (range(neurons_number[-2]+1)) ]
+                            else:
+                                weights = [float(x) for x in f.readline().split()]
+
+                            #normalizacja i zerowanie biasu tylko dla kohonena
+                            if layerType=="kohonen" or layerType=="kohonen2D":
+                                weights[-1] = 0.0
+                                weights = normalize(weights)
+
+                            #dla 2D musimy znac wielkosc siatki
+                            if layerType=="kohonen2D":                                
+                                L.neuron_number = neurons_number[-1]
+
+                            L.add_neuron(Neuron(weights, globals()[activationFun]))
 
 			self.add_layer(L)
 		f.close()
@@ -155,7 +191,6 @@ class NeuralNetwork:
         winner = self.find_winner(inputs)
         inputs = normalize(inputs)
         layer = self.layers[-1]
-        winner_position = self.layers[-1].neuron_position[winner]
         #obsluga sasiedztwa wielowymiarowego
         for neuron in layer.neurons:
             h = layer.distance(neuron, winner)
