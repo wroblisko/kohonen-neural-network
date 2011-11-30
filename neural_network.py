@@ -56,12 +56,13 @@ class NeuralNetwork:
     def add_layer(self, layer):
         self.layers.append(layer)
 		
+    """wyswietla wagi neurony jako tablice 3x3, pomijajac zerowy bias"""
     def print_weights(self):
         layer = self.layers[-1]
         print "Layer : %d neurons" % len(layer.neurons)
         for idx, neuron in enumerate(layer.neurons):
             print "Neuron %d: weights="%(idx,),
-            print_vector(neuron.weights)
+            print_vector(neuron.weights[:-1],3)
 
     """oblicza bez normalizacji"""
     def calculate_normal(self, inputs):
@@ -104,6 +105,7 @@ class NeuralNetwork:
         for neuron in layer.neurons:
             h = layer.distance(neuron, winner)
             neuron.weights = [neuron.weights[i] + h*speed_factor*(inputs[i]-neuron.weights[i]) for i in range(len(inputs))] + [0.0]
+            neuron.weights = normalize(neuron.weights)
             
     def kohonen_multilearn(self, images, epochs=8000, speed_factor=0.1, alfa=0.0001):
         for epoch in range(1,epochs+1):
