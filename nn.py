@@ -9,7 +9,11 @@ from utils import *
 from neural_network import *        
                         
 
-NN = NeuralNetwork("kohonen.txt", ro_min=0, kohonen2D_fun=distance2D, kohonen1D_fun=empty_distance)
+NN = NeuralNetwork("kohonen.txt")
+
+NN.layers[-1].distance_function = empty_distance
+NN.layers[-1].ro_min = 0.5
+
 NN.layers[-1].print_weights()
 
 images = [ [0, 0, 1, 0, 0, 1, 0, 0, 1],
@@ -30,7 +34,7 @@ for idx,image in enumerate(images):
 print "=============================="
 print "Learning..."
 
-NN.kohonen_multilearn(images)
+NN.layers[-1].kohonen_multilearn(images)
 
 NN.layers[-1].print_weights(columns=3, bias=False)
 print "Testing for images.."

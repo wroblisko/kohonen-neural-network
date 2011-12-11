@@ -1,2 +1,2 @@
 9 1
-4 kohonen linear 0 0
+4 kohonen linear 0 1
