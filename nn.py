@@ -9,17 +9,33 @@ from utils import *
 from neural_network import *        
                         
 
-NN = NeuralNetwork("kohonen.txt")
+NN = NeuralNetwork("parity.txt")
 
-NN.layers[-1].distance_function = empty_distance
-NN.layers[-1].ro_min = 0.5
+NN.layers[-2].distance_function = empty_distance
+NN.layers[-2].ro_min = 0.8
 
 NN.layers[-1].print_weights()
 
-images = [ [0, 0, 1, 0, 0, 1, 0, 0, 1],
-           [0, 1, 0, 1, 1, 1, 0, 1, 0],
-           [1, 1, 1, 1, 0, 1, 1, 1, 1],
-           [1, 0, 0, 0, 1, 0, 0, 0, 1]]
+images = [ [1, 1, 1, 0, 0, 0, 0, 0, 0],
+           [0, 0, 0, 1, 1, 1, 0, 0, 0],
+           [0, 0, 0, 0, 0, 0, 1, 1, 1],
+           [1, 0, 0, 1, 0, 0, 1, 0, 0],
+           [0, 1, 0, 0, 1, 0, 0, 1, 0],
+           [0, 0, 1, 0, 0, 1, 0, 0, 1],
+           [1, 0, 0, 0, 0, 0, 0, 0, 0],
+           [0, 0, 0, 0, 0, 0, 0, 0, 1],
+           [0, 0, 1, 0, 1, 0, 1, 0, 0]
+           ]
+
+images = readInputFile("input.in")
+
+doutputs = [  [1,0,0],[1,0,0],[1,0,0],
+              [0,1,0],[0,1,0],[0,1,0],
+              [0,0,1],[0,0,1],[0,0,1]
+            ]
+doutputs = readInputFile("outputs.in")
+images = [[0,0,0],[0,0,1],[0,1,0],[0,1,1],[1,0,0],[1,0,1],[1,1,0],[1,1,1]]
+doutputs = [[0],[1],[1],[0],[1],[0],[0],[1]]
 print "================================"
 print "Input images:"
 for idx,image in enumerate(images):
@@ -34,9 +50,18 @@ for idx,image in enumerate(images):
 print "=============================="
 print "Learning..."
 
-NN.layers[-1].kohonen_multilearn(images)
+NN.layers[-2].kohonen_multilearn(images)
 
-NN.layers[-1].print_weights(columns=3, bias=False)
+for (idx, image) in enumerate(images):
+    print "Image",idx+1,"-> ",
+    NN.calculate(image)
+    print_vector(NN.layers[-2].outputs)
+
+NN.layers[-1].grossberg_multilearn(images,doutputs,NN)
+
+
+NN.layers[-2].print_weights(columns=9, bias=True)
+NN.layers[-1].print_weights(columns=9, bias=True)
 print "Testing for images.."
 for (idx, image) in enumerate(images):
     print "Image",idx+1,"-> ",

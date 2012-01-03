@@ -4,6 +4,7 @@ from neuron import *
 from layer import *
 from kohonen1d_layer import *
 from kohonen2d_layer import *
+from GrossbergLayer import grossberg_layer
         
 class NeuralNetwork:
 
@@ -26,6 +27,8 @@ class NeuralNetwork:
                             L = KohonenLayer1D()
                         elif layerType=="kohonen2D":
                             L = KohonenLayer2D()
+                        elif layerType=="grossberg":
+                            L = grossberg_layer()
                         else:
                             raise Exception, "Bad layer"
 
@@ -41,7 +44,7 @@ class NeuralNetwork:
                             #normalizacja i zerowanie biasu tylko dla kohonena
                             if layerType=="kohonen" or layerType=="kohonen2D":
                                 weights[-1] = 0.0
-                                weights = normalize(weights)
+                                #weights = normalize(weights)
 
                             #dla 2D musimy znac wielkosc siatki
                             if layerType=="kohonen2D":                                
@@ -54,7 +57,7 @@ class NeuralNetwork:
 
     def add_layer(self, layer):
         self.layers.append(layer)
-		
+
     """zwraca wartosci neuronow wyjsciowych bez normalizacji"""
     def calculate_normal(self, inputs):
         for lid, layer in enumerate(self.layers):

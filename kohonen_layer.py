@@ -29,9 +29,9 @@ class KohonenLayer(Layer):
         for neuron in self.neurons:
             h = self.distance(neuron, winner)
             neuron.weights = [neuron.weights[i] + h*speed_factor*(inputs[i]-neuron.weights[i]) for i in range(len(inputs))] + [0.0]
-            neuron.weights = normalize(neuron.weights)
+            #neuron.weights = normalize(neuron.weights)
             
-    def kohonen_multilearn(self, images, epochs=8000, speed_factor=0.1, alfa=0.0001):
+    def kohonen_multilearn(self, images, epochs=8000, speed_factor=0.2, alfa=0.0001):
         for epoch in range(1,epochs+1):
             eta = max(speed_factor - alfa*epoch, 0)
             for image in images:

@@ -8,10 +8,12 @@ class Neuron:
         self.ro = 1
 
     def output(self, args):
-        # bias self.weights[-1]
+        return self.function(self.wei_sum(args))
+    
+    def wei_sum(self, args):
         total  = sum( [ self.weights[i] * args[i] for i in range(len(args)) ] )
         total += (-1) * self.weights[-1]
-        return self.function(total)
+        return total
     
     def function(self, arg):
         return self.func(arg)

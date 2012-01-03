@@ -1,2 +1,2 @@
 9 1
-4 kohonen linear 0 1
+4 kohonen sigmoid 0 1
