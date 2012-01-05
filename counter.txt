@@ -1,0 +1,3 @@
+9 2
+9 kohonen linear 0 1
+3 grossberg sigmoid 0 1
