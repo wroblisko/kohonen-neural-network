@@ -28,3 +28,7 @@ class Layer:
 
     def calculate(self, inputs):
         return self.calculate_normal(normalize(inputs))
+
+    def set_bias(self, bias):
+        for n in self.neurons:
+            n.set_bias(bias)

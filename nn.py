@@ -9,7 +9,39 @@ from utils import *
 from neural_network import *        
                         
 
-NN = NeuralNetwork("parity.txt")
+
+bp_images = [[1, 0, 1, 1, 0, 1, 1, 0, 1],
+             [1, 1, 1, 0, 0, 0, 1, 1, 1],
+             [0, 0, 0, 0, 1, 0, 0, 0, 0]]
+
+NN = NeuralNetwork("mlp.txt")
+
+print "================================"
+print "Input images:"
+for idx,image in enumerate(bp_images):
+    print "Image",idx,"=",
+    print_vector(image)
+
+NN.describe()
+print "================================\n\n"
+for i in range(1000):
+    NN.bp_learn_step([0, 1], [0, 1])
+for i in range(1000):
+    NN.bp_learn_step([1, 0], [1, 0])
+
+NN.bp_learn_step([0, 1], [0, 1])
+NN.bp_learn_step([1, 0], [1, 0])
+exit()
+
+
+
+
+
+
+
+
+
+
 
 NN.layers[-2].distance_function = empty_distance
 NN.layers[-2].ro_min = 0.8
@@ -36,11 +68,8 @@ doutputs = [  [1,0,0],[1,0,0],[1,0,0],
 doutputs = readInputFile("outputs.in")
 images = [[0,0,0],[0,0,1],[0,1,0],[0,1,1],[1,0,0],[1,0,1],[1,1,0],[1,1,1]]
 doutputs = [[0],[1],[1],[0],[1],[0],[0],[1]]
-print "================================"
-print "Input images:"
-for idx,image in enumerate(images):
-    print "Image",idx,"=",
-    print_vector(image)
+
+    
 print "================================"
 print "Normalized input images:"
 for idx,image in enumerate(images):
