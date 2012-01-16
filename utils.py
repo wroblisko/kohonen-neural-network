@@ -14,8 +14,17 @@ def sigmoid(total):
 def der_sigmoid(total):
     return sigmoid(total) * (1-sigmoid(total))
 
+def tanh(total):
+    return math.tanh(total)
+
+def der_tanh(total):
+    return 1-math.pow(math.tanh(total),2)
+
 def linear(x):
     return x
+
+def der_linear(x):
+    return 1
 
 def normalize(vec):
     if sum(vec)==0:

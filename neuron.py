@@ -5,6 +5,7 @@ class Neuron:
     def __init__(self, weights, func=sigmoid, bias=True):
         self.weights = weights
         self.func = func
+        self.der_func = eval('der_'+func.func_name)
         self.ro = 1
         self.bias = 1 if bias else 0
 
@@ -14,7 +15,8 @@ class Neuron:
     def output(self, args):
         self.inputs = args[:]                
         self.inputs.append(self.bias)
-        return self.function(self.wei_sum(self.inputs))
+        self.y = self.function(self.wei_sum(self.inputs))
+        return self.y
     
     def wei_sum(self, args):
         #bierze pod uwage bias (jest w args)

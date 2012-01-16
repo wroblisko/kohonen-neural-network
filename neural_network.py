@@ -77,27 +77,59 @@ class NeuralNetwork:
                 
     def set_bias(self, bias):
         for l in self.layers:
-            l.set_bias(bias)     
-    
-    def bp_learn_step(self, inputs, outputs, eta=0.5):
-        y = self.calculate_normal(inputs)        
-        errors = [i-j for (i,j) in zip(outputs,y)]
-        print "Total errors= ",errors        
+            l.set_bias(bias)                
+
+    def bp_learn_step(self, inputs, outputs, eta=0.5, momentum=0.1):
+        debug = False     
+        if debug:
+            print "Learing ",inputs
+        y = self.calculate_normal(inputs)
+        if debug:
+            print "Output is ",y
+        der_func = self.layers[-1].neurons[0].der_func        
+        errors = [(i-j)*der_func(j) for (i,j) in zip(outputs,y)]
+        if debug:
+            print "Total errors= ",errors        
         for (i,errors) in enumerate(errors):
             self.layers[-1].neurons[i].error = errors     
         #calculating errors - back
         layers_to_calculate = list(enumerate(self.layers[:-1]))
         layers_to_calculate.reverse()
-        for (i,layer) in layers_to_calculate:
-            print "Calculating errors for layer ",i            
+        for (i,layer) in layers_to_calculate:        
             next_layer = self.layers[i+1]
             for (neuron_i, neuron) in enumerate(layer.neurons):
                 neuron.error = sum([next_layer_neuron.error*next_layer_neuron.weights[neuron_i] for next_layer_neuron in next_layer.neurons])
-                print "Neuron ",neuron_i," in layer ",i," error= ", neuron.error
+                neuron.error = neuron.error*neuron.der_func(neuron.y)
+                if debug:
+                    print "Neuron ",neuron_i," in layer ",i," error= ", neuron.error
         #calculating modified weights
-        print "Modyfing weights....\n\n"
+        if debug:
+            print "Modyfing weights...."
         for layer in self.layers:
             for neuron in layer.neurons:
-                e = neuron.wei_sum(neuron.inputs[:-1]) #uwzglednia bias
-                der_sigmoid_value = der_sigmoid(e)
-                neuron.weights = [neuron.weights[i]+eta*neuron.error*der_sigmoid_value*neuron.inputs[i] for i in range(len(neuron.weights))]
+                e = neuron.wei_sum(neuron.inputs) #inputs zawiera wejscie bias
+                der_func_value = neuron.der_func(e)
+                neuron.weights = [neuron.weights[i] + 
+                                  eta*neuron.error*der_func_value*neuron.inputs[i] + 
+                                  momentum*neuron.last_changes_weights[i] for i in range(len(neuron.weights))]
+                neuron.last_changes_weights = [neuron.error*der_func_value*neuron.inputs[i] for i in range(len(neuron.weights))]
+        if debug:
+            self.describe()
+            print "\n"
+                
+    def bp_learn(self, inputs, outputs, epochs=1000, eta=0.5, momentum=0.1):
+        #reseting momentum's inits
+        for l in self.layers:
+            for n in l.neurons:
+                n.last_changes_weights = [0]*len(n.weights)
+        input_i = 0
+        for _ in range(epochs):
+            input_to_learn = inputs[input_i]
+            output_to_learn = outputs[input_i]            
+            input_i = (input_i + 1)%len(inputs)
+            self.bp_learn_step(input_to_learn, output_to_learn, eta, momentum)
+            
+    def print_error(self, inputs, outputs):
+        y = self.calculate_normal(inputs)        
+        errors = [i-j for (i,j) in zip(outputs,y)]
+        print "Total Errors = ",errors

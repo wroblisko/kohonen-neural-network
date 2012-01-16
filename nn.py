@@ -14,23 +14,59 @@ bp_images = [[1, 0, 1, 1, 0, 1, 1, 0, 1],
              [1, 1, 1, 0, 0, 0, 1, 1, 1],
              [0, 0, 0, 0, 1, 0, 0, 0, 0]]
 
-NN = NeuralNetwork("mlp.txt")
+NN = NeuralNetwork("mlp_xor.txt")
 
 print "================================"
 print "Input images:"
 for idx,image in enumerate(bp_images):
     print "Image",idx,"=",
     print_vector(image)
-
+NN.set_bias(True)
 NN.describe()
 print "================================\n\n"
-for i in range(1000):
-    NN.bp_learn_step([0, 1], [0, 1])
-for i in range(1000):
-    NN.bp_learn_step([1, 0], [1, 0])
+#NN.bp_learn([0, 1], [0, 1])
+#NN.bp_learn([1, 0], [1, 0])
 
-NN.bp_learn_step([0, 1], [0, 1])
-NN.bp_learn_step([1, 0], [1, 0])
+debug = True
+#NN.bp_learn([[0,0],[1,0],[0,1],[1,1]], [[0],[1],[1],[0]], epochs=5000, eta=0.5, momentum=0.1)
+#
+print "================================\n\n"
+#NN.print_error([0, 0], [0])
+#NN.print_error([0, 1], [1])
+#NN.print_error([1, 0], [1])
+#NN.print_error([1, 1], [0])
+#NN.print_error([0, 1], [0, 1])
+#NN.print_error([1, 0], [1, 0])
+
+def get_in(set):
+    return [i for i,o in set]
+def get_out(set):
+    return [o for i,o in set]
+
+
+parity = [
+          [[0,0,1],[0]],
+          [[0,1,0],[0]],
+          [[1,0,0],[0]],
+          [[0,1,1],[1]],
+          [[1,0,1],[1]],
+          [[1,1,0],[1]],
+          [[1,1,1],[0]],
+          [[0,0,0],[0]],
+           ]
+
+xor = [
+       [[0,0],[0]],
+       [[0,1],[1]],
+       [[1,0],[1]],
+       [[1,1],[0]],
+       ]
+#NN.bp_learn(get_in(parity), get_out(parity), epochs=10000, eta=0.1, momentum=0.0)
+NN.bp_learn(get_in(xor), get_out(xor), epochs=10000, eta=0.5, momentum=0.2)
+
+for i,o in xor:
+    NN.print_error(i,o)
+
 exit()
 
 
